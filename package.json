@@ -1,6 +1,6 @@
 {
   "name": "@slowclap/financial-charts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "React charts specific to finance.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

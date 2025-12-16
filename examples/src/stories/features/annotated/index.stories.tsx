@@ -1,5 +1,6 @@
 import { Annotate } from "../../../../../src";
 import Annotated from "./Annotated";
+import LabelBackground from "./LabelBackground";
 
 export default {
     component: Annotate,
@@ -9,3 +10,5 @@ export default {
 export const labels = () => <Annotated labelAnnotation />;
 
 export const paths = () => <Annotated svgAnnotation />;
+
+export const labelBackground = () => <LabelBackground />;
