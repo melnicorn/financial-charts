@@ -18,7 +18,7 @@ export interface TooltipCommonProps {
 
 export const defaultTooltipCommonProps = {
   fontFamily: "-apple-system, system-ui, 'Helvetica Neue', Ubuntu, sans-serif",
-  fontSize: 14,
+  fontSize: 11,
   origin: [0, 0],
 } as const;
 
