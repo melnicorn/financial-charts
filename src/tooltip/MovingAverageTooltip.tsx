@@ -1,21 +1,21 @@
 import { functor, GenericChartComponent, last, MoreProps } from "../core";
 import { format } from "d3-format";
 import * as React from "react";
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface SingleMAToolTipProps {
+export interface SingleMAToolTipProps extends TooltipCommonProps {
     readonly color: string;
     readonly displayName: string;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
     readonly forChart: number | string;
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
-    readonly onClick?: (event: React.MouseEvent<SVGRectElement, MouseEvent>, details: any) => void;
     readonly options: any;
-    readonly origin: [number, number];
     readonly textFill?: string;
     readonly value: string;
 }
@@ -25,7 +25,7 @@ export class SingleMAToolTip extends React.Component<SingleMAToolTipProps> {
         const { color, displayName, fontSize, fontFamily, fontWeight, textFill, labelFill, labelFontWeight, value } =
             this.props;
 
-        const translate = "translate(" + this.props.origin[0] + ", " + this.props.origin[1] + ")";
+        const translate = "translate(" + (this.props.origin as [number, number])[0] + ", " + (this.props.origin as [number, number])[1] + ")";
 
         return (
             <g transform={translate}>
@@ -51,18 +51,12 @@ export class SingleMAToolTip extends React.Component<SingleMAToolTipProps> {
     };
 }
 
-interface MovingAverageTooltipProps {
-    readonly className?: string;
+interface MovingAverageTooltipProps extends TooltipCommonProps {
     readonly displayFormat: (value: number) => string;
-    readonly origin: number[];
     readonly displayInit?: string;
     readonly displayValuesFor?: (props: MovingAverageTooltipProps, moreProps: any) => any;
-    readonly onClick?: (event: React.MouseEvent<SVGRectElement, MouseEvent>) => void;
     readonly textFill?: string;
     readonly labelFill?: string;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
     readonly width?: number;
     readonly options: {
         yAccessor: (data: any) => number;
@@ -75,6 +69,7 @@ interface MovingAverageTooltipProps {
 // tslint:disable-next-line: max-classes-per-file
 export class MovingAverageTooltip extends React.Component<MovingAverageTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         className: "react-financial-charts-tooltip react-financial-charts-moving-average-tooltip",
         displayFormat: format(".2f"),
         displayInit: "n/a",
@@ -96,7 +91,7 @@ export class MovingAverageTooltip extends React.Component<MovingAverageTooltipPr
             onClick,
             width = 65,
             fontFamily,
-            fontSize,
+            fontSize = MovingAverageTooltip.defaultProps.fontSize,
             fontWeight,
             textFill,
             labelFill,
@@ -104,6 +99,7 @@ export class MovingAverageTooltip extends React.Component<MovingAverageTooltipPr
             displayFormat,
             displayValuesFor = MovingAverageTooltip.defaultProps.displayValuesFor,
             options,
+            background,
         } = this.props;
 
         const currentItem = displayValuesFor(this.props, moreProps) ?? last(fullData);
@@ -116,6 +112,11 @@ export class MovingAverageTooltip extends React.Component<MovingAverageTooltipPr
 
         return (
             <g transform={`translate(${ox + x}, ${oy + y})`} className={className}>
+                {generateTooltipBackgroundValues(fontSize, width * options.length, background) && (
+                    <rect
+                        {...generateTooltipBackgroundValues(fontSize, width * options.length, background)}
+                    />
+                )}
                 {options.map((each, idx) => {
                     const yValue = currentItem && each.yAccessor(currentItem);
 

@@ -134,10 +134,24 @@ class StockChart extends React.Component<StockChartProps> {
                                 windowSize: ema12.options().windowSize,
                             },
                         ]}
+                        background={{
+                            fillStyle: "rgba(255, 0, 0, 0.1)",
+                            strokeStyle: "rgba(255, 0, 0, 1)",
+                            x: -5,
+                            y: -5,
+                            width: 150,
+                            height: 40
+                        }}
                     />
 
                     <ZoomButtons />
-                    <OHLCTooltip origin={[8, 16]} />
+                    <OHLCTooltip
+                        origin={[8, 16]}
+                        background={{
+                            fillStyle: "white",
+                            strokeStyle: "lightgray",
+                        }}
+                    />
                 </Chart>
                 <Chart
                     id={4}
@@ -161,6 +175,10 @@ class StockChart extends React.Component<StockChartProps> {
                             `${this.pricesDisplayFormat(d.bullPower)}, ${this.pricesDisplayFormat(d.bearPower)}`
                         }
                         origin={[8, 16]}
+                        background={{
+                            fillStyle: "white",
+                            strokeStyle: "lightgray",
+                        }}
                     />
                 </Chart>
                 <CrossHairCursor />

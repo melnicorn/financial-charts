@@ -4,17 +4,18 @@ import * as React from "react";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface BollingerBandTooltipProps {
-    readonly className?: string;
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface BollingerBandTooltipProps extends TooltipCommonProps {
     readonly displayFormat: (value: number) => string;
     readonly displayInit?: string;
     readonly displayValuesFor?: (props: BollingerBandTooltipProps, moreProps: any) => any;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
-    readonly onClick?: (event: React.MouseEvent) => void;
     readonly options: {
         movingAverageType: string;
         multiplier: number;
@@ -28,6 +29,7 @@ export interface BollingerBandTooltipProps {
 
 export class BollingerBandTooltip extends React.Component<BollingerBandTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         className: "react-financial-charts-tooltip react-financial-charts-bollingerband-tooltip",
         displayFormat: format(".2f"),
         displayValuesFor: (_: any, props: any) => props.currentItem,
@@ -54,8 +56,9 @@ export class BollingerBandTooltip extends React.Component<BollingerBandTooltipPr
             displayValuesFor = BollingerBandTooltip.defaultProps.displayValuesFor,
             displayInit,
             fontFamily,
-            fontSize,
+            fontSize = BollingerBandTooltip.defaultProps.fontSize,
             fontWeight,
+            background,
         } = this.props;
 
         const {
@@ -87,6 +90,11 @@ export class BollingerBandTooltip extends React.Component<BollingerBandTooltipPr
 
         return (
             <g transform={`translate(${x}, ${y})`} className={className} onClick={onClick}>
+                {generateTooltipBackgroundValues(fontSize, `${tooltipLabel}${tooltipValue}`, background) && (
+                    <rect
+                        {...generateTooltipBackgroundValues(fontSize, `${tooltipLabel}${tooltipValue}`, background)}
+                    />
+                )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     <ToolTipTSpanLabel fill={labelFill} fontWeight={labelFontWeight}>
                         {tooltipLabel}

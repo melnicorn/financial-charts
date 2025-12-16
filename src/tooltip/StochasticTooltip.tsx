@@ -4,14 +4,15 @@ import * as React from "react";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface StochasticTooltipProps {
-    readonly origin: number[] | ((width: number, height: number) => [number, number]);
-    readonly className?: string;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface StochasticTooltipProps extends TooltipCommonProps {
+    readonly origin: [number, number] | ((width: number, height: number) => [number, number]);
     readonly labelFill?: string;
-    readonly onClick?: (event: React.MouseEvent) => void;
     readonly yAccessor: (currentItem: any) => { K: number; D: number };
     readonly options: {
         windowSize: number;
@@ -32,6 +33,7 @@ export interface StochasticTooltipProps {
 
 export class StochasticTooltip extends React.Component<StochasticTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         className: "react-financial-charts-tooltip",
         displayFormat: format(".2f"),
         displayInit: "n/a",
@@ -48,7 +50,7 @@ export class StochasticTooltip extends React.Component<StochasticTooltipProps> {
         const {
             onClick,
             fontFamily,
-            fontSize,
+            fontSize = StochasticTooltip.defaultProps.fontSize,
             fontWeight,
             yAccessor,
             displayFormat,
@@ -60,6 +62,7 @@ export class StochasticTooltip extends React.Component<StochasticTooltipProps> {
             options,
             appearance,
             labelFill,
+            background,
         } = this.props;
         const {
             chartConfig: { width, height },
@@ -81,6 +84,19 @@ export class StochasticTooltip extends React.Component<StochasticTooltipProps> {
 
         return (
             <g className={className} transform={`translate(${x}, ${y})`} onClick={onClick}>
+                {generateTooltipBackgroundValues(
+                    fontSize,
+                    `${label} %K(${options.windowSize}, ${options.kWindowSize}): ${K} %D (${options.dWindowSize}): ${D}`,
+                    background,
+                ) && (
+                        <rect
+                            {...generateTooltipBackgroundValues(
+                                fontSize,
+                                `${label} %K(${options.windowSize}, ${options.kWindowSize}): ${K} %D (${options.dWindowSize}): ${D}`,
+                                background,
+                            )}
+                        />
+                    )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     <ToolTipTSpanLabel fill={labelFill}>{`${label} %K(`}</ToolTipTSpanLabel>
                     <tspan fill={stroke.kLine}>{`${options.windowSize}, ${options.kWindowSize}`}</tspan>

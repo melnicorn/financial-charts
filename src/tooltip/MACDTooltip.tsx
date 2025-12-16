@@ -4,15 +4,16 @@ import * as React from "react";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface MACDTooltipProps {
-    readonly origin: number[] | ((width: number, height: number) => [number, number]);
-    readonly className?: string;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface MACDTooltipProps extends TooltipCommonProps {
+    readonly origin: [number, number] | ((width: number, height: number) => [number, number]);
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
-    readonly onClick?: (event: React.MouseEvent) => void;
     readonly options: {
         slow: number;
         fast: number;
@@ -35,6 +36,7 @@ export interface MACDTooltipProps {
 
 export class MACDTooltip extends React.Component<MACDTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         className: "react-financial-charts-tooltip",
         displayFormat: format(".2f"),
         displayInit: "n/a",
@@ -51,7 +53,7 @@ export class MACDTooltip extends React.Component<MACDTooltipProps> {
             onClick,
             displayInit,
             fontFamily,
-            fontSize,
+            fontSize = MACDTooltip.defaultProps.fontSize,
             fontWeight,
             displayValuesFor,
             displayFormat,
@@ -62,6 +64,7 @@ export class MACDTooltip extends React.Component<MACDTooltipProps> {
             appearance,
             labelFill,
             labelFontWeight,
+            background,
         } = this.props;
 
         const {
@@ -82,6 +85,19 @@ export class MACDTooltip extends React.Component<MACDTooltipProps> {
 
         return (
             <g className={className} transform={`translate(${x}, ${y})`} onClick={onClick}>
+                {generateTooltipBackgroundValues(
+                    fontSize,
+                    `MACD (${options.slow}, ${options.fast}): ${macd} Signal (${options.signal}): ${signal} Divergence: ${divergence}`,
+                    background,
+                ) && (
+                        <rect
+                            {...generateTooltipBackgroundValues(
+                                fontSize,
+                                `MACD (${options.slow}, ${options.fast}): ${macd} Signal (${options.signal}): ${signal} Divergence: ${divergence}`,
+                                background,
+                            )}
+                        />
+                    )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     <ToolTipTSpanLabel fill={labelFill} fontWeight={labelFontWeight}>
                         MACD (

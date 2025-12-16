@@ -12,9 +12,14 @@ const displayTextsDefault = {
     na: "n/a",
 };
 
-export interface OHLCTooltipProps {
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface OHLCTooltipProps extends TooltipCommonProps {
     readonly accessor?: (data: any) => any;
-    readonly className?: string;
     readonly changeFormat?: (n: number | { valueOf(): number }) => string;
     readonly displayTexts?: {
         o: string;
@@ -24,28 +29,22 @@ export interface OHLCTooltipProps {
         na: string;
     };
     readonly displayValuesFor?: (props: OHLCTooltipProps, moreProps: any) => any;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
     readonly ohlcFormat?: (n: number | { valueOf(): number }) => string;
-    readonly onClick?: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
-    readonly origin?: [number, number] | ((width: number, height: number) => [number, number]);
     readonly percentFormat?: (n: number | { valueOf(): number }) => string;
     readonly textFill?: string | ((item: any) => string);
 }
 
 export class OHLCTooltip extends React.Component<OHLCTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         accessor: (d: unknown) => d,
         changeFormat: format("+.2f"),
         className: "react-financial-charts-tooltip-hover",
         displayTexts: displayTextsDefault,
         displayValuesFor: (_: any, props: any) => props.currentItem,
-        fontFamily: "-apple-system, system-ui, 'Helvetica Neue', Ubuntu, sans-serif",
         ohlcFormat: format(".2f"),
-        origin: [0, 0],
         percentFormat: format("+.2%"),
     };
 
@@ -61,7 +60,7 @@ export class OHLCTooltip extends React.Component<OHLCTooltipProps> {
             displayTexts = OHLCTooltip.defaultProps.displayTexts,
             displayValuesFor = OHLCTooltip.defaultProps.displayValuesFor,
             fontFamily,
-            fontSize,
+            fontSize = OHLCTooltip.defaultProps.fontSize,
             fontWeight,
             labelFill,
             labelFontWeight,
@@ -69,6 +68,7 @@ export class OHLCTooltip extends React.Component<OHLCTooltipProps> {
             onClick,
             percentFormat = OHLCTooltip.defaultProps.percentFormat,
             textFill,
+            background,
         } = this.props;
 
         const {
@@ -103,6 +103,37 @@ export class OHLCTooltip extends React.Component<OHLCTooltipProps> {
 
         return (
             <g className={className} transform={`translate(${x}, ${y})`} onClick={onClick}>
+                {generateTooltipBackgroundValues(
+                    fontSize,
+                    displayTexts.o +
+                    open +
+                    displayTexts.h +
+                    high +
+                    displayTexts.l +
+                    low +
+                    displayTexts.c +
+                    close +
+                    " " +
+                    change,
+                    background,
+                ) && (
+                        <rect
+                            {...generateTooltipBackgroundValues(
+                                fontSize,
+                                displayTexts.o +
+                                open +
+                                displayTexts.h +
+                                high +
+                                displayTexts.l +
+                                low +
+                                displayTexts.c +
+                                close +
+                                " " +
+                                change,
+                                background,
+                            )}
+                        />
+                    )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     <ToolTipTSpanLabel fill={labelFill} fontWeight={labelFontWeight} key="label_O">
                         {displayTexts.o}

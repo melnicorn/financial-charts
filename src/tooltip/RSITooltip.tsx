@@ -4,18 +4,19 @@ import * as React from "react";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface RSITooltipProps {
-    readonly className?: string;
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface RSITooltipProps extends TooltipCommonProps {
     readonly displayFormat: (value: number) => string;
     readonly displayInit?: string;
     readonly displayValuesFor: (props: RSITooltipProps, moreProps: any) => any;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
-    readonly onClick?: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
-    readonly origin: number[] | ((width: number, height: number) => number[]);
+    readonly origin: [number, number] | ((width: number, height: number) => [number, number]);
     readonly options: {
         windowSize: number;
     };
@@ -25,6 +26,7 @@ export interface RSITooltipProps {
 
 export class RSITooltip extends React.Component<RSITooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         displayFormat: format(".2f"),
         displayInit: "n/a",
         displayValuesFor: (_: RSITooltipProps, props: any) => props.currentItem,
@@ -41,7 +43,7 @@ export class RSITooltip extends React.Component<RSITooltipProps> {
             onClick,
             displayInit,
             fontFamily,
-            fontSize,
+            fontSize = RSITooltip.defaultProps.fontSize,
             fontWeight,
             yAccessor,
             displayFormat,
@@ -51,6 +53,7 @@ export class RSITooltip extends React.Component<RSITooltipProps> {
             labelFontWeight,
             textFill,
             displayValuesFor,
+            background,
         } = this.props;
 
         const {
@@ -68,6 +71,11 @@ export class RSITooltip extends React.Component<RSITooltipProps> {
         const tooltipLabel = `RSI (${options.windowSize}): `;
         return (
             <g className={className} transform={`translate(${x}, ${y})`} onClick={onClick}>
+                {generateTooltipBackgroundValues(fontSize, `${tooltipLabel}${value}`, background) && (
+                    <rect
+                        {...generateTooltipBackgroundValues(fontSize, `${tooltipLabel}${value}`, background)}
+                    />
+                )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     <ToolTipTSpanLabel fill={labelFill} fontWeight={labelFontWeight}>
                         {tooltipLabel}

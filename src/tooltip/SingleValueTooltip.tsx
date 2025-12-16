@@ -4,7 +4,13 @@ import * as React from "react";
 import { ToolTipText } from "./ToolTipText";
 import { ToolTipTSpanLabel } from "./ToolTipTSpanLabel";
 
-export interface SingleValueTooltipProps {
+import {
+    TooltipCommonProps,
+    defaultTooltipCommonProps,
+    generateTooltipBackgroundValues,
+} from "./TooltipCommon";
+
+export interface SingleValueTooltipProps extends TooltipCommonProps {
     readonly xDisplayFormat?: (value: number) => string;
     readonly yDisplayFormat?: (value: number) => string;
     readonly xInitDisplay?: string;
@@ -14,12 +20,6 @@ export interface SingleValueTooltipProps {
     readonly labelFill?: string;
     readonly labelFontWeight?: number;
     readonly valueFill?: string;
-    readonly origin?: [number, number] | ((width: number, height: number) => [number, number]);
-    readonly className?: string;
-    readonly fontFamily?: string;
-    readonly fontSize?: number;
-    readonly fontWeight?: number;
-    readonly onClick?: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
     readonly displayValuesFor?: (props: SingleValueTooltipProps, moreProps: any) => any;
     readonly xAccessor?: (d: any) => number;
     readonly yAccessor?: (d: any) => number;
@@ -27,6 +27,7 @@ export interface SingleValueTooltipProps {
 
 export class SingleValueTooltip extends React.Component<SingleValueTooltipProps> {
     public static defaultProps = {
+        ...defaultTooltipCommonProps,
         className: "react-financial-charts-tooltip",
         displayValuesFor: (_: any, props: any) => props.currentItem,
         labelFill: "#4682B4",
@@ -48,7 +49,7 @@ export class SingleValueTooltip extends React.Component<SingleValueTooltipProps>
         const {
             onClick,
             fontFamily,
-            fontSize,
+            fontSize = SingleValueTooltip.defaultProps.fontSize,
             fontWeight,
             labelFill,
             labelFontWeight,
@@ -64,6 +65,7 @@ export class SingleValueTooltip extends React.Component<SingleValueTooltipProps>
             yAccessor = SingleValueTooltip.defaultProps.yAccessor,
             xInitDisplay,
             yInitDisplay,
+            background,
         } = this.props;
 
         const {
@@ -93,6 +95,19 @@ export class SingleValueTooltip extends React.Component<SingleValueTooltipProps>
 
         return (
             <g className={className} transform={`translate(${x}, ${y})`} onClick={onClick}>
+                {generateTooltipBackgroundValues(
+                    fontSize,
+                    `${xLabel ? xLabel + ": " + xDisplayValue + " " : ""}${yLabel} ${yDisplayValue}`,
+                    background,
+                ) && (
+                        <rect
+                            {...generateTooltipBackgroundValues(
+                                fontSize,
+                                `${xLabel ? xLabel + ": " + xDisplayValue + " " : ""}${yLabel} ${yDisplayValue}`,
+                                background,
+                            )}
+                        />
+                    )}
                 <ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize} fontWeight={fontWeight}>
                     {xLabel ? (
                         <ToolTipTSpanLabel x={0} dy="5" fill={labelFill}>{`${xLabel}: `}</ToolTipTSpanLabel>
